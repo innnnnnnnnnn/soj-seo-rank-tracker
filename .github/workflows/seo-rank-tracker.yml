@@ -27,3 +27,6 @@ jobs:
         env:
           LINE_NOTIFY_TOKEN: ${{ secrets.LINE_NOTIFY_TOKEN }}
         run: python seo-rank-tracker.py
+        
+      - name: Set Timezone to Taiwan
+        run: sudo timedatectl set-timezone Asia/Taipei
