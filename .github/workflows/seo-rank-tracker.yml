@@ -27,3 +27,8 @@ jobs:
           CSE_ID: ${{ secrets.CSE_ID }}
           LINE_NOTIFY_TOKEN: ${{ secrets.LINE_NOTIFY_TOKEN }}
         run: python seo-rank-tracker.py
+        
+      - name: Log trigger info
+        run: |
+          echo "Workflow triggered at $(date)"
+          echo "Event: ${{ github.event_name }}"
