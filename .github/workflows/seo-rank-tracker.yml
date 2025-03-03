@@ -21,6 +21,12 @@ jobs:
       - name: Install Dependencies
         run: pip install requests pytz
 
+      - name: Check Secrets
+        run: |
+          echo "API_KEY is set: ${{ secrets.API_KEY != '' }}"
+          echo "CSE_ID is set: ${{ secrets.CSE_ID != '' }}"
+          echo "LINE_NOTIFY_TOKEN is set: ${{ secrets.LINE_NOTIFY_TOKEN != '' }}"  
+
       - name: Run SEO Rank Tracker
         env:
           API_KEY: ${{ secrets.API_KEY }}
