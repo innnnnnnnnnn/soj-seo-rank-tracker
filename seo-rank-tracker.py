@@ -1,6 +1,11 @@
 import os
 import requests
 from datetime import datetime
+import pytz  # ✅ 加入 pytz 處理時區
+
+# ✅ 使用環境變數讀取 API Key & CSE ID
+API_KEY = os.getenv("API_KEY")
+CSE_ID = os.getenv("CSE_ID")
 
 # ✅ 使用環境變數讀取 LINE Notify Token，避免硬編碼
 LINE_NOTIFY_TOKEN = os.getenv("LINE_NOTIFY_TOKEN", "你的_LINE_Notify_Token")
@@ -12,11 +17,8 @@ def send_line_notify(message):
         "Authorization": f"Bearer {LINE_NOTIFY_TOKEN}",
         "Content-Type": "application/x-www-form-urlencoded"
     }
-    data = {
-        "message": message
-    }
+    data = {"message": message}
 
-    # ✅ 確保 data 內容為 UTF-8，避免編碼錯誤
     response = requests.post(url, headers=headers, data=data)
 
     if response.status_code == 200:
@@ -26,17 +28,15 @@ def send_line_notify(message):
 
 def check_google_ranking_api():
     """查詢 Google 搜尋排名"""
-    api_key = "AIzaSyCz7WA4Cpy0SnuYqqe0JLDQqY6fGSmb1l4"
-    cse_id = "0776f01b6a61c4820"
     query = "清潔公司"
     target_domain = "soj.com.tw"
     position = 0
 
     # 檢查前 30 個結果 (分 3 次請求，每次 10 個)
     for start in [1, 11, 21]:
-        url = f"https://www.googleapis.com/customsearch/v1?key={api_key}&cx={cse_id}&q={query}&start={start}&gl=tw&hl=zh-TW"
+        url = f"https://www.googleapis.com/customsearch/v1?key={API_KEY}&cx={CSE_ID}&q={query}&start={start}&gl=tw&hl=zh-TW"
         response = requests.get(url)
-        
+
         if response.status_code != 200:
             error_msg = f"API Error at {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}: {response.text}\n"
             with open("ranking_log.txt", "a", encoding="utf-8") as f:
@@ -53,8 +53,10 @@ def check_google_ranking_api():
         if position > 0:
             break
 
-    # 記錄結果
-    current_date = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+    # ✅ 設定台灣時區 (UTC+8)
+    taipei_tz = pytz.timezone("Asia/Taipei")
+    current_date = datetime.now(pytz.utc).astimezone(taipei_tz).strftime("%Y-%m-%d %H:%M:%S")
+
     result_message = f"📊 SEO Rank Tracker\n🔎 關鍵字：清潔公司\n📅 日期：{current_date}\n🌐 排名：{position if position > 0 else '未進入前 30 名'}"
     
     with open("ranking_log.txt", "a", encoding="utf-8") as f:
