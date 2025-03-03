@@ -2,29 +2,28 @@ name: SEO Rank Tracker
 
 on:
   schedule:
-    - cron: "0 */6 * * *"  # 每 6 小時執行一次
-  workflow_dispatch:
+    - cron: "0 8 * * *"  # 每天 08:00 UTC 執行 (台灣時間 16:00)
+  workflow_dispatch:  # 允許手動執行
 
 jobs:
   run-tracker:
     runs-on: ubuntu-latest
+    timeout-minutes: 5
     steps:
       - name: Checkout repository
         uses: actions/checkout@v3
 
       - name: Setup Python
-        uses: actions/setup-python@v4
+        uses: actions/setup-python@v3
         with:
           python-version: '3.9'
 
       - name: Install dependencies
         run: |
           python -m pip install --upgrade pip
-          pip install -r requirements.txt || echo "requirements.txt not found!"
-          pip install requests  # 直接安装 requests 以防万一
-
-      - name: Verify installed packages
-        run: pip list  # 确保 requests 已安装
+          pip install -r requirements.txt
 
       - name: Run SEO Rank Tracker
+        env:
+          LINE_NOTIFY_TOKEN: ${{ secrets.LINE_NOTIFY_TOKEN }}
         run: python seo-rank-tracker.py
