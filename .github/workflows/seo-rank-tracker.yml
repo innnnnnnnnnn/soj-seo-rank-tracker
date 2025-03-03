@@ -13,14 +13,17 @@ jobs:
         uses: actions/checkout@v3
 
       - name: Setup Python
-        uses: actions/setup-python@v3
+        uses: actions/setup-python@v4
         with:
           python-version: '3.9'
 
       - name: Install dependencies
         run: |
           python -m pip install --upgrade pip
-          pip install -r requirements.txt  # 安裝依賴
+          pip install -r requirements.txt || echo "requirements.txt not found!"
+
+      - name: Debug file structure
+        run: ls -R  # 列出所有文件，检查 `requirements.txt` 是否存在
 
       - name: Run SEO Rank Tracker
-        run: python seo-rank-tracker.py  # 執行腳本
+        run: python seo-rank-tracker.py
