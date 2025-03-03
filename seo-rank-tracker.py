@@ -45,6 +45,3 @@ schedule.every().day.at("08:00").do(check_google_ranking_api)
 if __name__ == "__main__":
     print("程式已啟動，將每天自動檢查排名...")
     check_google_ranking_api()  # 立即測試
-    while True:
-        schedule.run_pending()
-        time.sleep(60)
