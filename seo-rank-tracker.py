@@ -1,16 +1,32 @@
 import requests
 from datetime import datetime
-import time
-import schedule
+
+# ✅ 替換為你的 LINE Notify Token
+LINE_NOTIFY_TOKEN = "你的_LINE_Notify_Token"
+
+def send_line_notify(message):
+    """發送 LINE Notify 訊息"""
+    url = "https://notify-api.line.me/api/notify"
+    headers = {
+        "Authorization": f"Bearer {LINE_NOTIFY_TOKEN}"
+    }
+    data = {
+        "message": message
+    }
+    response = requests.post(url, headers=headers, data=data)
+    if response.status_code == 200:
+        print("✅ LINE 訊息發送成功！")
+    else:
+        print(f"❌ LINE 訊息發送失敗: {response.text}")
 
 def check_google_ranking_api():
-    # 使用您提供的 API Key 和 CSE ID
+    """查詢 Google 搜尋排名"""
     api_key = "AIzaSyCz7WA4Cpy0SnuYqqe0JLDQqY6fGSmb1l4"
     cse_id = "0776f01b6a61c4820"
     query = "清潔公司"
     target_domain = "soj.com.tw"
     position = 0
-    
+
     # 檢查前 30 個結果 (分 3 次請求，每次 10 個)
     for start in [1, 11, 21]:
         url = f"https://www.googleapis.com/customsearch/v1?key={api_key}&cx={cse_id}&q={query}&start={start}&gl=tw&hl=zh-TW"
@@ -21,6 +37,7 @@ def check_google_ranking_api():
             with open("ranking_log.txt", "a", encoding="utf-8") as f:
                 f.write(error_msg)
             print(error_msg)
+            send_line_notify(f"❌ SEO Rank Tracker API 錯誤：\n{response.text}")  # 發送 LINE 錯誤通知
             return
         
         data = response.json()
@@ -30,18 +47,18 @@ def check_google_ranking_api():
                 break
         if position > 0:
             break
-    
+
     # 記錄結果
     current_date = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
-    log_entry = f"Date: {current_date}, Keyword: 清潔公司, Position of soj.com.tw: {position if position > 0 else 'Not found in top 30 results'}\n"
+    result_message = f"📊 SEO Rank Tracker\n🔎 關鍵字：清潔公司\n📅 日期：{current_date}\n🌐 排名：{position if position > 0 else '未進入前 30 名'}"
     
     with open("ranking_log.txt", "a", encoding="utf-8") as f:
-        f.write(log_entry)
-    print(f"搜尋完成 - {log_entry}")
+        f.write(result_message + "\n")
 
-# 設定每天定時執行
-schedule.every().day.at("08:00").do(check_google_ranking_api)
+    print(f"搜尋完成 - {result_message}")
+    send_line_notify(result_message)  # ✅ 發送 LINE 訊息
 
 if __name__ == "__main__":
-    print("程式已啟動，將每天自動檢查排名...")
-    check_google_ranking_api()  # 立即測試
+    print("程式已啟動，執行一次查詢...")
+    check_google_ranking_api()
+    print("查詢完成，程式結束。")
