@@ -1,23 +1,28 @@
+import os
 import requests
 from datetime import datetime
 
-# ✅ 替換為你的 LINE Notify Token
-LINE_NOTIFY_TOKEN = "你的_LINE_Notify_Token"
+# ✅ 使用環境變數讀取 LINE Notify Token，避免硬編碼
+LINE_NOTIFY_TOKEN = os.getenv("LINE_NOTIFY_TOKEN", "你的_LINE_Notify_Token")
 
 def send_line_notify(message):
     """發送 LINE Notify 訊息"""
     url = "https://notify-api.line.me/api/notify"
     headers = {
-        "Authorization": f"Bearer {LINE_NOTIFY_TOKEN}"
+        "Authorization": f"Bearer {LINE_NOTIFY_TOKEN}",
+        "Content-Type": "application/x-www-form-urlencoded"
     }
     data = {
         "message": message
     }
+
+    # ✅ 確保 data 內容為 UTF-8，避免編碼錯誤
     response = requests.post(url, headers=headers, data=data)
+
     if response.status_code == 200:
         print("✅ LINE 訊息發送成功！")
     else:
-        print(f"❌ LINE 訊息發送失敗: {response.text}")
+        print(f"❌ LINE 訊息發送失敗: {response.status_code}，回應: {response.text}")
 
 def check_google_ranking_api():
     """查詢 Google 搜尋排名"""
