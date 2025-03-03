@@ -2,7 +2,7 @@ name: Run SEO Rank Tracker
 
 on:
   schedule:
-    - cron: "0 0 * * *"  # UTC 00:00 = 台灣時間 08:00 (UTC+8)
+    - cron: "*/15 * * * *"  # UTC 00:00 = 台灣時間 08:00 (UTC+8)
   workflow_dispatch:  # 仍保留手動觸發
   
 jobs:
